@@ -1,14 +1,15 @@
+local GS = setmetatable({}, {
+	__index = function(self, index)
+		return game:GetService(index)
+	end
+})
+
 local udim_new = UDim.new
 local udim2_new = UDim2.new
 local color3_fromrgb = Color3.fromRGB
 local instance_new = Instance.new
 local nocallback = function() end
 local mouse = GS.Players.LocalPlayer:GetMouse()
-local GS = setmetatable({}, {
-	__index = function(self, index)
-		return game:GetService(index)
-	end
-})
 
 local library = {
 	flags = {
