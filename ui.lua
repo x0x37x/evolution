@@ -306,7 +306,6 @@ function library:CreateWindow(windowName)
 				end
 			}
 
-			print(library.flags[])
 			ToggleModule.Name = "ToggleModule"
 			ToggleModule.Parent = Tab
 			ToggleModule.BackgroundColor3 = color3_fromrgb(52, 62, 72)
