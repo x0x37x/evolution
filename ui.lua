@@ -280,7 +280,6 @@ function library:CreateWindow(windowName)
 		function modules:NewToggle(text, flag, enabled, callback)
 			local callback = callback or nocallback
 			local enabled = enabled or false
-			print(enabled)
 			local ToggleModule = instance_new("TextButton")
 			local ToggleModuleCorner = instance_new("UICorner")
 			local OffStatus = instance_new("Frame")
@@ -293,10 +292,10 @@ function library:CreateWindow(windowName)
 				State = false,
 				Callback = callback,
 				SetState = function(self, value)
-					local value = (value ~= nil and value) or (not library.flags:GetState(flag))
-					library.flags[flag].State = value
+					local value = (value ~= nil and value) or (not library.flags:GetState(flag or text))
+					library.flags[flag or text].State = value
 					task.spawn(function()
-						library.flags[flag].Callback(value)
+						library.flags[flag or text].Callback(value)
 					end)
 					utils:Tween({
 						Transparency = value and 1 or 0
@@ -306,6 +305,8 @@ function library:CreateWindow(windowName)
 					}, OnStatus):Play()
 				end
 			}
+
+			print(library.flags[])
 			ToggleModule.Name = "ToggleModule"
 			ToggleModule.Parent = Tab
 			ToggleModule.BackgroundColor3 = color3_fromrgb(52, 62, 72)
@@ -794,4 +795,3 @@ function library:CreateWindow(windowName)
 	end
 	return window
 end
-return library
