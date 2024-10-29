@@ -10,8 +10,9 @@ local color3_fromrgb = Color3.fromRGB
 local instance_new = Instance.new
 local nocallback = function() end
 local mouse = GS.Players.LocalPlayer:GetMouse()
+local uiName = GS.HttpService:GenerateGUID(true)
 
-local library = {
+local library; library = {
 	flags = {
 		GetState = function(s, flag)
 			return library.flags[flag].State
@@ -101,9 +102,11 @@ function library:CreateWindow(windowName)
 	end
 
 	drag(Main, TextLabel)
-
-	WoofUI.Name = GS.HttpService:GenerateGUID(true)
+    
+	WoofUI.Name = uiName
 	WoofUI.Parent = GS.CoreGui
+
+	WoofUI:SetAttribute("EvolutionUi", true)
 
 	Main.Name = "Main"
 	Main.Parent = WoofUI
@@ -423,10 +426,14 @@ function library:CreateWindow(windowName)
 			KeybindValueCorner.CornerRadius = udim_new(0, 4)
 			KeybindValueCorner.Name = "KeybindValueCorner"
 			KeybindValueCorner.Parent = KeybindValue
-			GS.UserInputService.InputBegan:Connect(function(inp, gpe)
+			local inpCon; inpCon = GS.UserInputService.InputBegan:Connect(function(inp, gpe)
 				if gpe then
 					return
 				end
+                if not GS.CoreGui:FindFirstChild(uiName) then
+                    inpCon:Disconnect()
+                    return
+                end
 				if inp.UserInputType ~= Enum.UserInputType.Keyboard then
 					return
 				end
@@ -438,7 +445,7 @@ function library:CreateWindow(windowName)
 			KeybindValue.MouseButton1Click:Connect(function()
 				KeybindValue.Text = "..."
 				wait()
-				local key, uwu = GS.UserInputService.InputEnded:Wait()
+				local key = GS.UserInputService.InputEnded:Wait()
 				local keyName = tostring(key.KeyCode.Name)
 				if key.UserInputType ~= Enum.UserInputType.Keyboard then
 					KeybindValue.Text = nm
@@ -609,6 +616,7 @@ function library:CreateWindow(windowName)
 				end
 			end)
 		end
+
 		function modules:NewDropdown(text, flag, options, callback)
 			local callback = callback or nocallback
 			library.flags[flag] = {
@@ -778,19 +786,48 @@ function library:CreateWindow(windowName)
 				OptionCorner.Name = "OptionCorner"
 				OptionCorner.Parent = Option
 				Option.MouseButton1Click:Connect(function()
-					DropdownText.PlaceholderText = option
-					DropdownText.Text = ""
+					DropdownText.Text = option
 					library.flags[flag].State = option
 					task.spawn(toggleDropdown)
 					callback(option)
 				end)
 			end
-			library.flags[flag].RemoveOption = function(self, option)
-				DropdownBottom:WaitForChild(option):Destroy()
+			library.flags[flag].RemoveOption = function(self, optionName)
+				local option = DropdownBottom:FindFirstChild(optionName)
+                if option then
+                    option:Destroy()
+                end
 			end
 			library.flags[flag]:SetOptions(options)
 		end
+
+        function modules:NewPlayerSelect(text, flag, allowClient, callback)
+            local allowClient = allowClient or false
+            local callback = callback or nocallback
+            local players = {}
+
+            for _, v in next, game:GetService("Players"):GetPlayers() do
+                if allowClient == false and v == GS.Players.LocalPlayer then
+                    continue
+                end
+                table.insert(players, `{v.Name} ({v.DisplayName})`)
+            end
+
+            modules:NewDropdown(text, flag, players, function(plrName)
+				local playerName = string.split(plrName, " (")[1]
+                callback(GS.Players[playerName])
+            end)
+
+            GS.Players.PlayerAdded:Connect(function(player)
+                library.flags[flag]:AddOption(`{player.Name} ({player.DisplayName})`)
+            end)
+
+            GS.Players.PlayerRemoving:Connect(function(player)
+                library.flags[flag]:RemoveOption(`{player.Name} ({player.DisplayName})`)
+            end)
+        end
 		return modules
 	end
 	return window
 end
+return library
