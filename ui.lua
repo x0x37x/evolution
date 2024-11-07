@@ -656,7 +656,7 @@ function library:CreateWindow(windowName)
 			DropdownText.TextColor3 = color3_fromrgb(255, 255, 255)
 			DropdownText.TextSize = 14.000
 			DropdownText.TextXAlignment = Enum.TextXAlignment.Left
-			DropdownText.Text = options[1]
+			DropdownText.Text = options[1] or ""
 			OpenDropdown.Name = "OpenDropdown"
 			OpenDropdown.Parent = DropdownModule
 			OpenDropdown.BackgroundColor3 = color3_fromrgb(255, 255, 255)
