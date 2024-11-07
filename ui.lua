@@ -719,7 +719,7 @@ function library:CreateWindow(windowName)
 						setAllVisible()
 					else
 						if option:IsA("TextButton") then
-							if option.Name:lower():sub(1, string.len(text)) == text:lower() then
+							if option.Name:lower():match(text:lower()) then
 								option.Visible = true
 							else
 								option.Visible = false
