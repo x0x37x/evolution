@@ -694,6 +694,7 @@ function library:CreateWindow(windowName)
 			DropdownBottomPadding.Parent = DropdownBottom
 			DropdownBottomPadding.PaddingTop = udim_new(0, 6)
 			local dropdownOpen = false
+			local isSearching = false
 			DropdownBottomLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
 				if not dropdownOpen then
 					return
@@ -749,7 +750,11 @@ function library:CreateWindow(windowName)
 				if dropdownOpen then
 					return
 				end
+				isSearching = true
 				toggleDropdown()
+			end)
+			DropdownText.FocusLost:Connect(function()
+				isSearching = false
 			end)
 			DropdownText:GetPropertyChangedSignal("Text"):Connect(function()
 				searchDropdown(DropdownText.Text)
@@ -758,6 +763,9 @@ function library:CreateWindow(windowName)
 				library.flags[flag]:ClearOptions()
 				for i = 1, #options do
 					library.flags[flag]:AddOption(options[i])
+				end
+				if isSearching then
+					searchDropdown(DropdownText.Text)
 				end
 			end
 			library.flags[flag].ClearOptions = function(self)
